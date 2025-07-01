@@ -48,6 +48,19 @@ const upload = multer({
   },
 });
 
+// 处理根路径请求
+app.get("/", (req, res) => {
+  res.json({
+    status: "success",
+    message: "欢迎访问文件上传服务",
+    endpoints: {
+      upload: `/upload`, // 添加上传端点示例
+      files: `/files`, // 添加文件列表端点示例
+    },
+    uploadDirectory: uploadDir,
+  });
+});
+
 // 文件上传路由
 app.post("/api/upload", upload.single("file"), (req, res) => {
   if (!req.file) {
