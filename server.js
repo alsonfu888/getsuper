@@ -62,17 +62,30 @@ app.get("/", (req, res) => {
 });
 
 // 文件上传路由
-app.post("/api/upload", upload.single("file"), (req, res) => {
-  // 输出日志 - 上传来源
-  console.log(`文件上传请求来自: ${req.ip} - ${req.headers["user-agent"]}`);
-  if (!req.file) {
-    return res.status(400).json({ error: "失败" });
-  }
+app.post(
+  "/api/upload",
+  (req, res, next) => {
+    req.on("aborted", () => {
+      console.warn(`⚠️ 上传被中断（客户端主动断开）: ${req.ip}`);
+    });
 
-  res.status(200).json({
-    message: "成功",
-  });
-});
+    req.on("close", () => {
+      console.log(`ℹ️ 连接关闭: ${req.ip}`);
+    });
+
+    next(); // 继续交给 multer 处理
+  },
+  upload.single("file"),
+  (req, res) => {
+    if (!req.file) {
+      console.warn("❌ 上传失败或被中断，没有文件写入");
+      return res.status(400).json({ error: "失败" });
+    }
+
+    console.log("✅ 上传成功:", req.ip, req.file.filename);
+    res.status(200).json({ message: "成功" });
+  }
+);
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
