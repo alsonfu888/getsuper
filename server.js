@@ -63,6 +63,8 @@ app.get("/", (req, res) => {
 
 // 文件上传路由
 app.post("/api/upload", upload.single("file"), (req, res) => {
+  // 输出日志 - 上传来源
+  console.log(`文件上传请求来自: ${req.ip} - ${req.headers["user-agent"]}`);
   if (!req.file) {
     return res.status(400).json({ error: "未上传文件" });
   }
