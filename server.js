@@ -44,7 +44,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 300 * 1024 * 1024, // 限制100MB
+    fileSize: 800 * 1024 * 1024,
   },
 });
 
@@ -66,13 +66,11 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
   // 输出日志 - 上传来源
   console.log(`文件上传请求来自: ${req.ip} - ${req.headers["user-agent"]}`);
   if (!req.file) {
-    return res.status(400).json({ error: "未上传文件" });
+    return res.status(400).json({ error: "失败" });
   }
 
   res.status(200).json({
-    message: "文件上传成功",
-    filename: req.file.filename,
-    path: req.file.path,
+    message: "成功",
   });
 });
 
